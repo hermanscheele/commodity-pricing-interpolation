@@ -39,6 +39,28 @@ b0, b1, b2, g = fit_nelson_siegel(t, y)
 t_fit = np.linspace(1, n, 100)
 y_fit = nelson_siegel(t_fit, b0, b1, b2, g)
 
-plt.plot(t, y, 'o', color='r')
-plt.plot(t_fit, y_fit)
-plt.show()
+# ------- Plot Nelson Siegel fit --------
+# plt.plot(t, y, 'o', color='r')
+# plt.plot(t_fit, y_fit)
+# plt.show()
+
+
+# the correlation model p
+def corr_func(h, smooth, mode: bool):
+    if mode == 0: return np.exp(- smooth * h)
+    else: return np.exp(- smooth * h**2)
+
+
+# y_hat = F0(T_i) - m(T_i)
+def construct_y_hat(t, y, b0, b1, b2, g):
+    t = np.asarray(t, float).ravel()
+    y = np.asarray(y, float).ravel()
+    if t.shape != y.shape:
+        raise ValueError("t and y must be same len")
+        
+    m = nelson_siegel(t, b0, b1, b2, g)
+    return y - m
+
+#print(construct_y_hat(t, y,b0, b1, b2, g))
+
+
