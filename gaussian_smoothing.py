@@ -61,6 +61,7 @@ def construct_y_hat(t, y, b0, b1, b2, g):
     m = nelson_siegel(t, b0, b1, b2, g)
     return y - m
 
+
 #print(construct_y_hat(t, y,b0, b1, b2, g))
 
 
