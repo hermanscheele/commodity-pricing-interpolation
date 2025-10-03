@@ -12,3 +12,4 @@ y = np.array(o_p)
 
 # plt.plot(x, y, 'o')
 # plt.show()
+
