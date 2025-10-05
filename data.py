@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-n = 15
+n = 20
 df = pd.read_csv('archive/wti_prices.csv')
 
 o_p = df['open'][:n] # 30 open prices
