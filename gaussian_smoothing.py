@@ -35,15 +35,6 @@ def fit_nelson_siegel(t, y):
     return popt   # (b0, b1, b2, g)
 
 
-b0, b1, b2, g = fit_nelson_siegel(t, y)
-t_fit = np.linspace(1, n, 100)
-y_fit = nelson_siegel(t_fit, b0, b1, b2, g)
-
-# ------- Plot Nelson Siegel fit --------
-# plt.plot(t, y, 'o', color='r')
-# plt.plot(t_fit, y_fit)
-# plt.show()
-
 
 # the correlation model p
 def corr_func(h, smooth, h_squared: bool):
@@ -52,7 +43,7 @@ def corr_func(h, smooth, h_squared: bool):
 
 
 # y_hat = F0(T_i) - m(T_i)
-def construct_y_hat(t, y, b0, b1, b2, g):
+def y_hat(t, y, b0, b1, b2, g):
     t = np.asarray(t, float).ravel()
     y = np.asarray(y, float).ravel()
     if t.shape != y.shape:
@@ -61,5 +52,62 @@ def construct_y_hat(t, y, b0, b1, b2, g):
     m = nelson_siegel(t, b0, b1, b2, g)
     return y - m
 
-#print(construct_y_hat(t, y,b0, b1, b2, g))
+#print(y_hat(t, y,b0, b1, b2, g))
 
+
+# construct c_x vector 
+def c_x(x, n, t, smooth):
+    c = []
+    t = np.asarray(t, float).ravel()
+
+    for k in range(n):
+        abs_diff = abs(x - t[k])
+        corr = corr_func(abs_diff, smooth, True) # correlation model fixed with False
+        c.append(corr)
+    
+    return np.array(c)
+
+
+# construct covariance matrix
+def covar_matrix(n, t, smooth):
+    matrix = []
+    t = np.asarray(t, float).ravel()
+
+    for i in range(n):
+        row = []
+        for j in range(n):
+            abs_diff = abs(t[i] - t[j])
+            corr = corr_func(abs_diff, smooth, True)
+            row.append(corr)
+
+        matrix.append(row)
+
+    return np.array(matrix)
+    
+
+# Kriging fucntion
+def kriging_func(x, t, b0, b1, b2, g, n, smooth):
+
+    m = nelson_siegel(x, b0, b1, b2, g)
+    cx = c_x(x, n, t, smooth)
+    covar_mat_inv = np.linalg.inv(covar_matrix(n, t, smooth))
+    y_h = y_hat(t, y, b0, b1, b2, g)
+
+    return m + (cx.T @ covar_mat_inv @ y_h)
+
+
+
+
+
+b0, b1, b2, g = fit_nelson_siegel(t, y)
+t_fit = np.linspace(1, n, 400)
+y_fit_regression = nelson_siegel(t_fit, b0, b1, b2, g)
+
+# ------- Plot Nelson Siegel fit --------
+plt.plot(t, y, 'o', color='r')
+#plt.plot(t_fit, y_fit_regression)
+# plt.show()
+
+y_fit_gaussian = kriging_func(t_fit, t, b0, b1, b2, g, n, 1.0)
+plt.plot(t_fit, y_fit_gaussian)
+plt.show()
