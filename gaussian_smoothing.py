@@ -46,8 +46,8 @@ y_fit = nelson_siegel(t_fit, b0, b1, b2, g)
 
 
 # the correlation model p
-def corr_func(h, smooth, mode: bool):
-    if mode == 0: return np.exp(- smooth * h)
+def corr_func(h, smooth, h_squared: bool):
+    if h_squared == 0: return np.exp(- smooth * h)
     else: return np.exp(- smooth * h**2)
 
 
@@ -61,7 +61,5 @@ def construct_y_hat(t, y, b0, b1, b2, g):
     m = nelson_siegel(t, b0, b1, b2, g)
     return y - m
 
-
 #print(construct_y_hat(t, y,b0, b1, b2, g))
-
 
