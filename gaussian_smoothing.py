@@ -110,7 +110,10 @@ plt.plot(t, y, 'o', color='r')
 plt.plot(t_fit, y_fit_regression)
 # plt.show()
 
-y_krigin = kriging_func(t_fit, t, b0, b1, b2, g, n, 1.0, True)       #  .shape -> (500, )
+smooth = 1.0
+gauss = True
+
+y_krigin = kriging_func(t_fit, t, b0, b1, b2, g, n, smooth, gauss)       #  .shape -> (500, )
 plt.plot(t_fit, y_krigin)
 plt.show()
 
