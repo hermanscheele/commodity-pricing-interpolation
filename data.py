@@ -10,6 +10,4 @@ o_p = df['open'][:n] # 30 open prices
 t = np.linspace(1, n, len(o_p))
 y = np.array(o_p)
 
-# plt.plot(x, y, 'o')
-# plt.show()
 
