@@ -99,4 +99,4 @@ def plot_curve_length(self, f, linspace, n):
         I, _ = quad(f, 1, n)
         res.append(I)
 
-    plt.plot(linspace, res)
+    plt.plot(linspace, res, label='cruve length')

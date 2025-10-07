@@ -24,12 +24,12 @@ class Kriging:
     def plot_fns(self):
         y_fit_regression = nelson_siegel(self.t_fit, self.b0, self.b1, self.b2, self.g)
         plt.plot(self.x, self.y, 'o', color='r')
-        plt.plot(self.t_fit, y_fit_regression)
+        plt.plot(self.t_fit, y_fit_regression, label='Nelson-Siegel')
 
     def plot_fk(self):
         y_krigin = kriging_func(self.t_fit, self.x, self.b0, self.b1, self.b2, self.g, self.n, self.smooth, self.gauss, self.y)      
         plt.plot(self.x, self.y, 'o', color='r')
-        plt.plot(self.t_fit, y_krigin)
+        plt.plot(self.t_fit, y_krigin, label='Kriging')
         
     def plot_f(self):
         self.plot_fns()
@@ -53,10 +53,12 @@ class Kriging:
 
 k = Kriging(t, y)
 
-k.update_smooth(1.3)
+k.update_smooth(1.9)
 k.plot_f()
+plt.legend()
 plt.show()
 
-x_smooth = np.linspace(1.5, 3, 10)
+x_smooth = np.linspace(1.5, 3, 15)
 k.plot_fk_curve_lenghts(x_smooth)
+plt.legend()
 plt.show()
