@@ -32,7 +32,7 @@ def fit_nelson_siegel(t, y):
 
 # the correlation model p
 def corr_func(h, smooth, h_squared: bool):
-    if h_squared == 0: return np.exp(- smooth * h)
+    if h_squared == False: return np.exp(- smooth * h)
     else: return np.exp(- smooth * h**2)
 
 
