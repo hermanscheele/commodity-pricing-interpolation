@@ -87,16 +87,23 @@ def kriging_func(x, t, b0, b1, b2, g, n, smooth, gauss, y):
 
     return m + (cx.T @ covar_mat_inv @ y_h)
 
+
 # derivative of f
 def deriv(f, x, h):
     return (f(x + h) - f(x)) / h
 
 
-def plot_curve_length(self, f, linspace, n):
+# second derivative of f
+def sec_deriv(f, x, h):
+    return (f(x + h) - 2 * f(x) + f(x - h)) / h**2
+
+
+def plot_f_integration(self, f, linspace, n):
     res = []
     for i in linspace:
         self.smooth = i
         I, _ = quad(f, 1, n)
         res.append(I)
 
-    plt.plot(linspace, res, label='cruve length')
+    plt.plot(linspace, res)
+

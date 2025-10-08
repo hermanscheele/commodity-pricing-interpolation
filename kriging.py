@@ -13,7 +13,7 @@ class Kriging:
         self.smooth = 1.0
         self.gauss = True
         self.t_fit = np.linspace(1, self.n, 500)
-        self.h = 1e-8
+        self.h = 1e-5
 
     def update_smooth(self, smooth):
         self.smooth = smooth
@@ -38,28 +38,35 @@ class Kriging:
     def plot_data(self):
         plt.plot(self.x, self.y, 'o', color='r')
 
-    def plot_fk_curve_lenghts(self, linspace):
-
-        def f_k(x):
+    def f_k(self, x):
             return kriging_func(x, self.x, self.b0, self.b1, self.b2, self.g, self.n, self.smooth, self.gauss, self.y)
 
-        def f_k_integrate(x):
-            return np.sqrt(1 + deriv(f_k, x, 0.00001)**2)
+    def plot_fk_curve_lenghts(self, f_k, linspace):
         
-        plot_curve_length(self, f_k_integrate, linspace, self.n)
+        def f_k_integrate(x):
+            return np.sqrt(1 + deriv(f_k, x, self.h)**2)
+        
+        plot_f_integration(self, f_k_integrate, linspace, self.n)
 
+    def plot_fk_curve_smoothness(self, f_k, linspace):
 
+        def f_k_integrate(x):
+            return sec_deriv(f_k, x, self.h) ** 2
+
+        plot_f_integration(self, f_k_integrate, linspace, self.n)
 
 
 k = Kriging(t, y)
 
-k.update_smooth(2.0)
+k.update_smooth(1.0)
 
 k.plot_f()
 plt.legend()
 plt.show()
 
-# x_smooth = np.linspace(1.5, 3, 15)
-# k.plot_fk_curve_lenghts(x_smooth)
-# plt.legend()
-# plt.show()
+x_smooth = np.linspace(0.5, 3, 10) 
+k.plot_fk_curve_lenghts(k.f_k, x_smooth)
+#k.plot_fk_curve_smoothness(k.f_k, x_smooth)
+
+plt.legend()
+plt.show()
