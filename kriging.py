@@ -58,15 +58,17 @@ class Kriging:
 
 k = Kriging(t, y)
 
-k.update_smooth(1.0)
+#k.update_gauss(False)
+k.update_smooth(2.3)
 
 k.plot_f()
 plt.legend()
 plt.show()
 
-x_smooth = np.linspace(0.5, 3, 10) 
-k.plot_fk_curve_lenghts(k.f_k, x_smooth)
-#k.plot_fk_curve_smoothness(k.f_k, x_smooth)
+x_smooth = np.linspace(0.8, 1.3, 10) 
+#k.plot_fk_curve_lenghts(k.f_k, x_smooth)
+k.plot_fk_curve_smoothness(k.f_k, x_smooth)
 
 plt.legend()
 plt.show()
+
