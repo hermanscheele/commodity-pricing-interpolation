@@ -71,3 +71,4 @@ k.plot_fk_curve_smoothness(k.f_k, x_smooth)
 
 plt.legend()
 plt.show()
+
