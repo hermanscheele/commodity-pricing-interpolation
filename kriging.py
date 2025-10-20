@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from data import t, y
 from scipy.integrate import quad
 
+
 class Kriging:
 
     def __init__(self, x, y):
