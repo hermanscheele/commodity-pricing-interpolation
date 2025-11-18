@@ -105,5 +105,6 @@ def plot_f_integration(self, f, linspace, n):
         I, _ = quad(f, 1, n)
         res.append(I)
 
-    plt.plot(linspace, res)
+    plt.plot(linspace, res, )
 
+    

@@ -2,7 +2,6 @@
 from utils import *
 import matplotlib.pyplot as plt
 from data import t, y
-from scipy.integrate import quad
 
 
 class Kriging:
@@ -36,6 +35,8 @@ class Kriging:
     def plot_f(self):
         self.plot_fns()
         self.plot_fk()
+        plt.xlabel('t')
+        plt.ylabel('price')
 
     def plot_data(self):
         plt.plot(self.x, self.y, 'o', color='r')
@@ -47,15 +48,18 @@ class Kriging:
         
         def f_k_integrate(x):
             return np.sqrt(1 + deriv(f_k, x, self.h)**2)
-        
+       
         plot_f_integration(self, f_k_integrate, linspace, self.n)
-
+        
     def plot_fk_curve_smoothness(self, f_k, linspace):
 
         def f_k_integrate(x):
             return sec_deriv(f_k, x, self.h) ** 2
 
         plot_f_integration(self, f_k_integrate, linspace, self.n)
+        plt.xlabel('smoothness param.')
+        plt.ylabel('total curvature: ' + r'$\int \text{sec.deriv(f)}^{2} \ $')
+
 
 
 k = Kriging(t, y)
@@ -63,14 +67,21 @@ k = Kriging(t, y)
 #k.update_gauss(False)
 k.update_smooth(2.3)
 
+# ------------- Plot kriging ------------- #
 k.plot_f()
+
+plt.grid(True, alpha=0.3)
 plt.legend()
+plt.savefig("figures/nelson_siegel_kriging.pdf")
 plt.show()
 
-x_smooth = np.linspace(0.8, 1.3, 10) 
+
+# ----------- Plot curvature ------------ #
+x_smooth = np.linspace(0.7, 1.3, 10) 
 #k.plot_fk_curve_lenghts(k.f_k, x_smooth)
 k.plot_fk_curve_smoothness(k.f_k, x_smooth)
 
-plt.legend()
+plt.grid(True, alpha=0.3)
+plt.savefig("figures/curve_smoothness_vs_smooth_param.pdf")
 plt.show()
 
