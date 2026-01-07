@@ -3,18 +3,26 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-n = 20
+n = 15
 df = pd.read_csv('data/wti_prices.csv')
 
-o_p = df['open'][:n] # n open prices
-
-t = np.linspace(1, n, len(o_p))
-y = np.array(o_p)
 
 
-# plt.plot(t, y, 'o', label='price points')
+y_high = df['high'][:n]
+y_avg = df['average'][:n] # n open prices
+y_low = df['low'][:n]
+
+t = np.linspace(1, n, len(y_avg))
+
+# plt.plot(t, y_high, 'o', label='high points')
+# plt.plot(t, y_avg, 'o', color="green", label='average points')
+# plt.plot(t, y_low, 'o', color="red", label='low points')
+
+# plt.vlines(t, y_low, y_high, color='gray', alpha=0.5, label='Daily Range (I_n)')
+
 # plt.xlabel('t')
 # plt.ylabel('price')
 
 # plt.legend()
 # plt.show()
+
