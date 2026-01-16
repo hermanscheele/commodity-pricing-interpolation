@@ -56,19 +56,35 @@ def draw_random_interval_vector(I):
 
 
 from nelson_siegel_utils import fit_nelson_siegel, nelson_siegel
-from data import y_avg
+from data import y_avg, y_high, y_low, t
+y_avg = np.array(y_avg)
+
+
+
+
+
+
+I = construct_intervals(t, y_high, y_low)
 
 def draw_gaussian_interval_vector(I):
 
     t_vals = [i[0] for i in I]
-    ns_params = fit_nelson_siegel(t_vals, y_avg)
-    mean_vector = nelson_siegel(t_vals, )
+    t_vals = np.array(t_vals)
+
+    print(y_avg)
+
+    b0, b1, b2, g = fit_nelson_siegel(t_vals, y_avg)
+    mean_vector = nelson_siegel(t_vals, b0, b1, b2, g)
+
+
+
+    return mean_vector
 
 
 
 
 
 
-    pass
+draw_gaussian_interval_vector(I)
 
 
