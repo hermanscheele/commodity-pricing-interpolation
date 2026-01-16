@@ -1,3 +1,4 @@
+import random
 import numpy as np
 from scipy.integrate import quad
 import matplotlib.pyplot as plt
@@ -33,4 +34,41 @@ def construct_intervals(t_vals, high, low):
         intervals.append( (t_vals[i], high[i], low[i]) )
 
     return intervals
+
+
+
+
+def draw_random_interval_vector(I):
+    n = len(I)
+    v = []
+
+    for i in range(n):
+        high = I[i][1]
+        low = I[i][2]
+        draw = random.uniform(low, high)        
+        v.append(draw)
+
+    return v
+
+
+
+
+
+
+from nelson_siegel_utils import fit_nelson_siegel, nelson_siegel
+from data import y_avg
+
+def draw_gaussian_interval_vector(I):
+
+    t_vals = [i[0] for i in I]
+    ns_params = fit_nelson_siegel(t_vals, y_avg)
+    mean_vector = nelson_siegel(t_vals, )
+
+
+
+
+
+
+    pass
+
 

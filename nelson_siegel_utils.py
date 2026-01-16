@@ -5,6 +5,8 @@ from scipy.optimize import curve_fit, minimize
 def nelson_siegel(x, b0, b1, b2, g):
     return b0 + b1*np.exp(-g*x) + b2*x*np.exp(-g*x)
 
+
+
 def fit_nelson_siegel(t, y):
     
      # ---- Initial guesses ----
@@ -27,11 +29,8 @@ def fit_nelson_siegel(t, y):
 
     return popt   # (b0, b1, b2, g)
 
-from scipy.optimize import minimize
-import numpy as np
 
-from scipy.optimize import minimize
-import numpy as np
+
 
 
 def constrained_fit_nelson_siegel(t, y, intervals):
