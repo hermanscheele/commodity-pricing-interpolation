@@ -55,7 +55,7 @@ Sigma = construct_covariance(x_i, R, sigma_sq=1.0, rho=0.5)
 
 
 # Constructing and drawing vector from the gaussian distribution ϕ(z | ẑ^e)
-# Same sequential steps as the algorithm from the paper
+# Same sequential steps as the algorithm from paper
 
 def draw_gaussian_interval_vector(intervalls):
 
