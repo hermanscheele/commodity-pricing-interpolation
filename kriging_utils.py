@@ -50,7 +50,6 @@ def covar_matrix(n, t, smooth, gauss):
 
 # Kriging fucntion
 def kriging_func(x, t, b0, b1, b2, g, n, smooth, gauss, y):
-
     m = nelson_siegel(x, b0, b1, b2, g)
     cx = c_x(x, n, t, smooth, gauss)
     covar_mat_inv = np.linalg.inv(covar_matrix(n, t, smooth, gauss))
@@ -62,7 +61,6 @@ def kriging_func(x, t, b0, b1, b2, g, n, smooth, gauss, y):
 
 # Kriging function with Nelson-Siegel-Svensson
 def kriging_svensson_func(x, t, b0, b1, b2, b3, g, g2, n, smooth, gauss, y):
-
     m_x = nelson_siegel_svensson(x, b0, b1, b2, b3, g, g2)
     cx = c_x(x, n, t, smooth, gauss)
     covar_mat_inv = np.linalg.inv(covar_matrix(n, t, smooth, gauss))
