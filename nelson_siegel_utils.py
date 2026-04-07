@@ -86,8 +86,9 @@ def constrained_fit_nelson_siegel(t, y, intervals, penalty_weight):
             penalty += max(0, pred_i - high_i)**2
         return fit_error + penalty_weight * penalty
 
-    bounds = [(-200, 200), (-200, 200), (-200, 200), (1e-6, 2.0)]
-    res = differential_evolution(loss_function, bounds, maxiter=2000, tol=1e-10)
+    y_scale = np.mean(y)
+    bounds = [(y_scale * 0.5, y_scale * 1.5), (-y_scale, y_scale), (-y_scale, y_scale), (1e-6, 2.0)]
+    res = differential_evolution(loss_function, bounds, maxiter=5000, tol=1e-12, popsize=20)
     return res.x
 
 

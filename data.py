@@ -2,13 +2,14 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-n = 16
+n = 15
+data_shift = 0
 df = pd.read_csv('data/wti_prices.csv')
 
 
-y_high = df['high'][:n]
-y_avg = df['average'][:n] # n open prices
-y_low = df['low'][:n]
+y_high = df['high'][data_shift : n + data_shift]
+y_avg = df['average'][data_shift : n + data_shift] # n open prices
+y_low = df['low'][data_shift : n + data_shift]
 
 y_mid = (y_high + y_low) / 2 
 

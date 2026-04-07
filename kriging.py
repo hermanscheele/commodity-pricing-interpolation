@@ -67,7 +67,6 @@ class Kriging:
 
 
 
-
     # -------------- Plotting ------------- #     
     def plot_data(self):
         plt.plot(self.x, self.y, 'o', color='b')
