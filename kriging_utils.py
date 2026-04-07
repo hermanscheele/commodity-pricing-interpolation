@@ -1,5 +1,5 @@
 import numpy as np
-from nelson_siegel_utils import nelson_siegel
+from nelson_siegel_utils import nelson_siegel, nelson_siegel_svensson
 
 # the correlation model p
 def corr_func(h, smooth, h_squared: bool):
@@ -57,3 +57,16 @@ def kriging_func(x, t, b0, b1, b2, g, n, smooth, gauss, y):
     y_h = y_hat(t, y, b0, b1, b2, g)
 
     return m + (cx.T @ covar_mat_inv @ y_h)
+
+
+
+# Kriging function with Nelson-Siegel-Svensson
+def kriging_svensson_func(x, t, b0, b1, b2, b3, g, g2, n, smooth, gauss, y):
+
+    m_x = nelson_siegel_svensson(x, b0, b1, b2, b3, g, g2)
+    cx = c_x(x, n, t, smooth, gauss)
+    covar_mat_inv = np.linalg.inv(covar_matrix(n, t, smooth, gauss))
+    y_h = nelson_siegel_svensson(t, b0, b1, b2, b3, g, g2)  # compute m with NSS
+    y_h = y - y_h  # residuals
+
+    return m_x + (cx.T @ covar_mat_inv @ y_h)

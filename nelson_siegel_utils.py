@@ -2,11 +2,23 @@ import numpy as np
 from scipy.optimize import curve_fit, minimize
 
 
+# Original Nelson-Siegel
 def nelson_siegel(x, b0, b1, b2, g):
     return b0 + b1*np.exp(-g*x) + b2*x*np.exp(-g*x)
 
 
+# Nelson-Siegel-Svensson extension 
+def nelson_siegel_svensson(x, b0, b1, b2, b3, g1, g2):
+    return (
+            b0
+            + b1 * np.exp(-g1 * x)
+            + b2 * x * np.exp(-g1 * x)
+            + b3 * x * np.exp(-g2 * x)
+        )
 
+
+
+# Original Nelson-Siegel fit
 def fit_nelson_siegel(t, y):
     
      # ---- Initial guesses ----
@@ -31,45 +43,81 @@ def fit_nelson_siegel(t, y):
 
 
 
+# Nelson-Siegel-Svensson fit
+def fit_nelson_siegel_svensson(t, y):
+
+    # ---- Initial guesses ----
+    if np.any(t > 0):
+        g1_init = 1.0 / np.median(t[t > 0])
+    else:
+        g1_init = 1.0
+    g2_init = g1_init * 0.5    # second decay at a different rate
+
+    b0_init = y[-1]
+    b1_init = y[0] - y[-1]
+    b2_init = 0.0
+    b3_init = 0.0
+
+    # Vector for intial curve-parameters
+    p0 = [b0_init, b1_init, b2_init, b3_init, g1_init, g2_init]
+
+    # ---- Bounds (g1, g2 > 0) ----
+    bounds = ([-np.inf, -np.inf, -np.inf, -np.inf, 1e-8, 1e-8],
+              [ np.inf,  np.inf,  np.inf,  np.inf,  np.inf,  np.inf])
+
+    # ---- Fit ----
+    popt, _ = curve_fit(nelson_siegel_svensson, t, y, p0=p0, bounds=bounds, maxfev=10000)
+
+    return popt   #  Returns optimal curve parameters [b0, b1, b2, b3, g1, g2] (NumPy array)
+
+
 
 
 def constrained_fit_nelson_siegel(t, y, intervals):
-    """
-    Formal Constrained Regression:
-    t: vector x^e (observed time points)
-    y: vector z^e (observed prices/yields)
-    intervals: I_1 x ... x I_n (the 'gates' for the trend)
-    """
-    
-    # 1. THE LOSS FUNCTION: L(z^e, Lambda(x^e; theta))
-    # This represents the sum of squared residuals between observations and the trend
+
     def loss_function(theta):
-        # theta = [b0, b1, b2, g]
-        # Lambda(x^e; theta)
         predictions = nelson_siegel(t, *theta)
         return np.sum((y - predictions)**2)
 
-    # 2. THE CONSTRAINTS: Lambda(x_i; theta) \in I_i
-    # Formally, for each i, low_i <= Lambda(x_i; theta) <= high_i
     cons = []
     for x_i, low_i, high_i in intervals:
-        # Lower bound constraint: Lambda - low >= 0
         cons.append({'type': 'ineq', 'fun': lambda theta, x=x_i, l=low_i: nelson_siegel(x, *theta) - l})
-        # Upper bound constraint: high - Lambda >= 0
         cons.append({'type': 'ineq', 'fun': lambda theta, x=x_i, h=high_i: h - nelson_siegel(x, *theta)})
 
-    # 3. INITIAL GUESS (Warm Start)
-    # To avoid the 'linesearch' error, start exactly where the unconstrained fit is
     p0 = fit_nelson_siegel(t, y)
 
-    # 4. SOLVING THE PROBLEM
-    # SLSQP is designed specifically for these inequality constraints
     res = minimize(
         loss_function, 
         p0, 
         method='SLSQP', 
         constraints=cons,
         bounds=[(None, None), (None, None), (None, None), (1e-6, 2.0)], # Ensure g > 0
+        options={'ftol': 1e-10, 'maxiter': 2000}
+    )
+
+    return res.x
+
+
+
+def constrained_fit_nelson_siegel_svensson(t, y, intervals):
+
+    def loss_function(theta):
+        predictions = nelson_siegel_svensson(t, *theta)
+        return np.sum((y - predictions)**2)
+
+    cons = []
+    for x_i, low_i, high_i in intervals:
+        cons.append({'type': 'ineq', 'fun': lambda theta, x=x_i, l=low_i: nelson_siegel_svensson(x, *theta) - l})
+        cons.append({'type': 'ineq', 'fun': lambda theta, x=x_i, h=high_i: h - nelson_siegel_svensson(x, *theta)})
+
+    p0 = fit_nelson_siegel_svensson(t, y)
+
+    res = minimize(
+        loss_function,
+        p0,
+        method='SLSQP',
+        constraints=cons,
+        bounds=[(None, None), (None, None), (None, None), (None, None), (1e-6, 2.0), (1e-6, 2.0)],  # Ensure g1, g2 > 0
         options={'ftol': 1e-10, 'maxiter': 2000}
     )
 
