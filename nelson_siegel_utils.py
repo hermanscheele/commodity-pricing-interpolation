@@ -1,5 +1,6 @@
 import numpy as np
-from scipy.optimize import curve_fit, minimize
+from scipy.optimize import curve_fit
+from scipy.optimize import differential_evolution
 
 
 # Original Nelson-Siegel
@@ -73,52 +74,36 @@ def fit_nelson_siegel_svensson(t, y):
 
 
 
-def constrained_fit_nelson_siegel(t, y, intervals):
+def constrained_fit_nelson_siegel(t, y, intervals, penalty_weight):
 
     def loss_function(theta):
         predictions = nelson_siegel(t, *theta)
-        return np.sum((y - predictions)**2)
+        fit_error = np.sum((y - predictions)**2)
+        penalty = 0
+        for x_i, low_i, high_i in intervals:
+            pred_i = nelson_siegel(x_i, *theta)
+            penalty += max(0, low_i - pred_i)**2
+            penalty += max(0, pred_i - high_i)**2
+        return fit_error + penalty_weight * penalty
 
-    cons = []
-    for x_i, low_i, high_i in intervals:
-        cons.append({'type': 'ineq', 'fun': lambda theta, x=x_i, l=low_i: nelson_siegel(x, *theta) - l})
-        cons.append({'type': 'ineq', 'fun': lambda theta, x=x_i, h=high_i: h - nelson_siegel(x, *theta)})
-
-    p0 = fit_nelson_siegel(t, y)
-
-    res = minimize(
-        loss_function, 
-        p0, 
-        method='SLSQP', 
-        constraints=cons,
-        bounds=[(None, None), (None, None), (None, None), (1e-6, 2.0)], # Ensure g > 0
-        options={'ftol': 1e-10, 'maxiter': 2000}
-    )
-
+    bounds = [(-200, 200), (-200, 200), (-200, 200), (1e-6, 2.0)]
+    res = differential_evolution(loss_function, bounds, maxiter=2000, tol=1e-10)
     return res.x
 
 
 
-def constrained_fit_nelson_siegel_svensson(t, y, intervals):
+def constrained_fit_nelson_siegel_svensson(t, y, intervals, penalty_weight):
 
     def loss_function(theta):
         predictions = nelson_siegel_svensson(t, *theta)
-        return np.sum((y - predictions)**2)
+        fit_error = np.sum((y - predictions)**2)
+        penalty = 0
+        for x_i, low_i, high_i in intervals:
+            pred_i = nelson_siegel_svensson(x_i, *theta)
+            penalty += max(0, low_i - pred_i)**2
+            penalty += max(0, pred_i - high_i)**2
+        return fit_error + penalty_weight * penalty
 
-    cons = []
-    for x_i, low_i, high_i in intervals:
-        cons.append({'type': 'ineq', 'fun': lambda theta, x=x_i, l=low_i: nelson_siegel_svensson(x, *theta) - l})
-        cons.append({'type': 'ineq', 'fun': lambda theta, x=x_i, h=high_i: h - nelson_siegel_svensson(x, *theta)})
-
-    p0 = fit_nelson_siegel_svensson(t, y)
-
-    res = minimize(
-        loss_function,
-        p0,
-        method='SLSQP',
-        constraints=cons,
-        bounds=[(None, None), (None, None), (None, None), (None, None), (1e-6, 2.0), (1e-6, 2.0)],  # Ensure g1, g2 > 0
-        options={'ftol': 1e-10, 'maxiter': 2000}
-    )
-
+    bounds = [(-200, 200), (-200, 200), (-200, 200), (-200, 200), (1e-6, 2.0), (1e-6, 2.0)]
+    res = differential_evolution(loss_function, bounds, maxiter=2000, tol=1e-10)
     return res.x

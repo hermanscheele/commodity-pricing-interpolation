@@ -24,6 +24,7 @@ class Kriging:
         self.gauss = True
         self.t_fit = np.linspace(1, self.n, 500)
         self.h = 1e-5
+        self.penalty_w = 1e6
 
 
 
@@ -34,6 +35,9 @@ class Kriging:
 
     def update_gauss(self, gauss):
         self.gauss = gauss
+
+    def update_penalty_weight(self, w):
+        self.penalty_w = w
 
 
 
@@ -52,14 +56,14 @@ class Kriging:
 
     def fit_constrained_nelson_siegel(self):
         intervals = list(zip(self.x, y_low, y_high))        
-        self.b0, self.b1, self.b2, self.g = constrained_fit_nelson_siegel(self.x, self.y, intervals)
+        self.b0, self.b1, self.b2, self.g = constrained_fit_nelson_siegel(self.x, self.y, intervals, self.penalty_w)
 
     def fit_nelson_siegel_svensson(self):
         self.b0, self.b1, self.b2, self.b3, self.g, self.g2 = fit_nelson_siegel_svensson(self.x, self.y)       
 
     def fit_constrained_nelson_siegel_svensson(self):
         intervals = list(zip(self.x, y_low, y_high))        
-        self.b0, self.b1, self.b2, self.b3, self.g, self.g2 = constrained_fit_nelson_siegel_svensson(self.x, self.y, intervals)
+        self.b0, self.b1, self.b2, self.b3, self.g, self.g2 = constrained_fit_nelson_siegel_svensson(self.x, self.y, intervals, self.penalty_w)
 
 
 
@@ -86,7 +90,7 @@ class Kriging:
 
     def plot_nelson_siegel_svensson_constrained(self):
         y_fit_regression = nelson_siegel_svensson(self.t_fit, self.b0, self.b1, self.b2, self.b3, self.g, self.g2)
-        plt.plot(self.t_fit, y_fit_regression, color="green", label='Nelson-Siegel (constrained)')
+        plt.plot(self.t_fit, y_fit_regression, color="green", label='Nelson-Siegel-Svensson (constrained)')
     
 
      # --- Plot Kriging --- #
@@ -151,13 +155,13 @@ class Kriging:
         print(f"B0: {self.b0}")
         print(f"B1: {self.b1}")
         print(f"B2: {self.b2}")
-        print(f"g: {self.g}")
-
+        print(f"g:  {self.g}")
         print(f"B3: {self.b3}")
         print(f"g2: {self.g2}")
 
 
 
+    #TODO: Weekly/Monthly SHIFT for smooth prama stability check.
 
 
 
@@ -167,8 +171,11 @@ k = Kriging(t, y_mid)
 
 
 
-# #k.update_gauss(False)
+# ------------- Update Params. ---------- #
+# k.update_gauss(False)
 # k.update_smooth(1.9)
+# k.update_penalty_weight(10)
+
 
 
 # ------------- Plot Data ---------- #
@@ -185,9 +192,9 @@ k = Kriging(t, y_mid)
 #k.show()
 
 # ------------- Plot Constrained Nelson-Seigel ---------- #
-# k.fit_constrained_nelson_siegel()
-# k.plot_nelson_siegel_constrained()
-# k.show(intervals=True)
+k.fit_constrained_nelson_siegel()
+k.plot_nelson_siegel_constrained()
+k.show(intervals=True)
 
 
 

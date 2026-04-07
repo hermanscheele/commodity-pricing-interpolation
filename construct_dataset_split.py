@@ -19,8 +19,11 @@ fig, ax = plt.subplots()
 
 ax.scatter(point_maturities, point_prices)
 
+cap = 0.1
 for t, bid, ask in zip(bidask_maturities, bid_prices, ask_prices):
-    ax.plot([t, t], [bid, ask], color="red")
+    ax.plot([t, t], [bid, ask], color="black")
+    ax.plot([t - cap, t + cap], [bid, bid], color="black")
+    ax.plot([t - cap, t + cap], [ask, ask], color="black")
 
 
 plt.show()
