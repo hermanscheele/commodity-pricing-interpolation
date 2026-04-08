@@ -20,7 +20,6 @@ def construct_covariance(x, R, sigma_sq, rho):
 
 
 def construct_cross_covariance(x_i, x_e, R, sigma_sq, rho):
-    """Covariance between inequality locations x_i and equality locations x_e."""
     Sigma_ie = np.zeros((len(x_i), len(x_e)))
     for k in range(len(x_i)):
         for l in range(len(x_e)):
@@ -29,16 +28,7 @@ def construct_cross_covariance(x_i, x_e, R, sigma_sq, rho):
 
 
 def conditional_gaussian_params(x_i, x_e, z_e_hat, ns_params, sigma_sq, rho):
-    """
-    Compute conditional Gaussian parameters mu and Sigma for ϕ(z | ẑ^e).
-
-    x_i       : illiquid maturities (n,)
-    x_e       : liquid maturities (m,)
-    z_e_hat   : observed liquid prices ẑ^e (m,)
-    ns_params : (b0, b1, b2, g) for Nelson-Siegel trend Λ
-    sigma_sq  : variance σ²
-    rho       : correlation length ρ
-    """
+  
     # Trend means μ^i and μ^e  (eq. 6, 7)
     mu_i = nelson_siegel(x_i, *ns_params)
     mu_e = nelson_siegel(x_e, *ns_params)
@@ -59,10 +49,7 @@ def conditional_gaussian_params(x_i, x_e, z_e_hat, ns_params, sigma_sq, rho):
 
 
 def rejection_sample_gaussian(mu, Sigma, intervals, S):
-    """
-    Draw S samples from N(mu, Sigma) that satisfy all interval constraints.
-    intervals: list of (t_i, low_i, high_i)
-    """
+ 
     samples = []
     lows  = np.array([iv[1] for iv in intervals])
     highs = np.array([iv[2] for iv in intervals])

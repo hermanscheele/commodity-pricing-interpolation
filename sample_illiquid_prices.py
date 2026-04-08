@@ -1,9 +1,16 @@
+import os
 import numpy as np
 import matplotlib.pyplot as plt
 from nelson_siegel_utils import constrained_fit_nelson_siegel
 from vector_draw_utils import conditional_gaussian_params, rejection_sample_gaussian
 from kriging_utils import kriging_func
 from data import t, y_mid, y_low, y_high
+
+
+FIG_DIR = 'figures'
+for fmt in ['pdf', 'png', 'jpeg', 'eps']:
+    os.makedirs(os.path.join(FIG_DIR, fmt), exist_ok=True)
+
 
 
 def split_liquid_illiquid(t, y_mid, y_low, y_high, threshold=0.0):
@@ -60,6 +67,23 @@ samples, x_i, x_e, z_e_hat, ns_params, intervals = sample_illiquid_prices(
 )
 
 
+# # ---------- Plot Data ---------- #
+# cap = 0.1
+# plt.scatter(x_e, z_e_hat, color='green', zorder=5, label='Liquid')
+# for j, (t_j, low_j, high_j) in enumerate(intervals):
+#     label = 'Illiquid' if j == 0 else None
+#     plt.plot([t_j, t_j], [low_j, high_j], color='black', alpha=0.5, label=label)
+#     plt.plot([t_j - cap, t_j + cap], [low_j, low_j], color='black', alpha=0.5)
+#     plt.plot([t_j - cap, t_j + cap], [high_j, high_j], color='black', alpha=0.5)
+# plt.legend()
+# plt.grid(alpha=0.3)
+# plt.xlabel(r'$t$')
+# plt.ylabel('Price')
+# for fmt in ['pdf', 'png', 'jpeg', 'eps']:
+#     plt.savefig(os.path.join(FIG_DIR, fmt, f'data.{fmt}'))
+# plt.show()
+
+
 
 
 smooth   = 1 / (2 * rho**2)
@@ -93,12 +117,17 @@ plt.scatter(x_e, z_e_hat, color='green', zorder=5, label='Liquid')
 for j, (t_j, low_j, high_j) in enumerate(intervals):
     label = 'Illiquid' if j == 0 else None
     alpha = 0.5
+
     plt.plot([t_j, t_j], [low_j, high_j], color='red', alpha=alpha, label=label)
     plt.plot([t_j - cap, t_j + cap], [low_j, low_j], alpha=alpha, color='red')
     plt.plot([t_j - cap, t_j + cap], [high_j, high_j], alpha=alpha, color='red')
-
+    
 plt.legend()
 plt.grid(alpha=0.3)
 plt.xlabel(r'$t$')
 plt.ylabel('Price')
+
+for fmt in ['pdf', 'png', 'jpeg', 'eps']:
+    plt.savefig(os.path.join(FIG_DIR, fmt, f'average_kriging_curve.{fmt}'))
+
 plt.show()

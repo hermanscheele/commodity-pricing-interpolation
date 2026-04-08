@@ -2,7 +2,12 @@ from utils import *
 from nelson_siegel_utils import *
 from kriging_utils import *
 import matplotlib.pyplot as plt
+import os
 from data import t, y_mid, y_high, y_low
+
+FIG_DIR = 'figures'
+for fmt in ['pdf', 'png', 'jpeg', 'eps']:
+    os.makedirs(os.path.join(FIG_DIR, fmt), exist_ok=True)
 
 
 
@@ -75,33 +80,35 @@ class Kriging:
     # --- Plot NS & NSS --- #
     def plot_nelson_siegel(self):
         y_fit_regression = nelson_siegel(self.t_fit, self.b0, self.b1, self.b2, self.g)
-        plt.plot(self.x, self.y, 'o')
-        plt.plot(self.t_fit, y_fit_regression, label='Nelson-Siegel')
+        plt.plot(self.x, self.y, 'o', color='g', label='liquid price-points')
+        plt.plot(self.t_fit, y_fit_regression, color="purple", label='Nelson-Siegel',  alpha=0.7)
 
     def plot_nelson_siegel_constrained(self):
         y_fit_regression = nelson_siegel(self.t_fit, self.b0, self.b1, self.b2, self.g)
-        plt.plot(self.t_fit, y_fit_regression, color="green", label='Nelson-Siegel (constrained)')
+        plt.plot(self.x, self.y, 'o', color='g')
+        plt.plot(self.t_fit, y_fit_regression, color="purple", label='Nelson-Siegel (constrained)')
     
     def plot_nelson_siegel_svensson(self):
         y_fit = nelson_siegel_svensson(self.t_fit, self.b0, self.b1, self.b2, self.b3, self.g, self.g2)
-        plt.plot(self.x, self.y, 'o')
-        plt.plot(self.t_fit, y_fit, label='Nelson-Siegel-Svensson')
+        plt.plot(self.x, self.y, 'o', color='r', label='liquid price-points')
+        plt.plot(self.t_fit, y_fit, label='Nelson-Siegel-Svensson',  alpha=0.7)
 
     def plot_nelson_siegel_svensson_constrained(self):
         y_fit_regression = nelson_siegel_svensson(self.t_fit, self.b0, self.b1, self.b2, self.b3, self.g, self.g2)
-        plt.plot(self.t_fit, y_fit_regression, color="green", label='Nelson-Siegel-Svensson (constrained)')
+        plt.plot(self.x, self.y, 'o', color='g')
+        plt.plot(self.t_fit, y_fit_regression, color="purple", label='Nelson-Siegel-Svensson (constrained)')
     
 
      # --- Plot Kriging --- #
     def plot_kriging(self):
         y_fit = kriging_func(self.t_fit, self.x, self.b0, self.b1, self.b2, self.g, self.n, self.smooth, self.gauss, self.y)      
-        plt.plot(self.x, self.y, 'o', color='r')
-        plt.plot(self.t_fit, y_fit, label='Kriging')
+        plt.plot(self.x, self.y, 'o', color='g', label='liquid price-points')
+        plt.plot(self.t_fit, y_fit, label='Kriging (NS)', color='blue', alpha=0.7)
 
     def plot_kriging_svensson(self):
         y_fit = kriging_svensson_func(self.t_fit, self.x, self.b0, self.b1, self.b2, self.b3, self.g, self.g2, self.n, self.smooth, self.gauss, self.y)
         plt.plot(self.x, self.y, 'o', color='r')
-        plt.plot(self.t_fit, y_fit, label='Kriging-Svensson')
+        plt.plot(self.t_fit, y_fit, label='Kriging (NS-S)')
 
 
 
@@ -123,20 +130,19 @@ class Kriging:
 
 
 
-    # -------------- Show ------------- #     
-    def show(self, title=None, intervals=False, curve_length=False, curve_smooth= False):
+    # -------------- Show ------------- #
+    def show(self, title=None, intervals=False, curve_length=False, curve_smooth=False, filename=None):
         if title:
             plt.title(title)
         if intervals:
             cap = 0.1
             for i, (t_i, bid, ask) in enumerate(zip(self.x, y_low, y_high)):
                 label = 'Intervals' if i == 0 else None
-                plt.plot([t_i, t_i], [bid, ask], color='black', alpha=0.6, label=label)
-                plt.plot([t_i - cap, t_i + cap], [bid, bid], color='black', alpha=0.6)
-                plt.plot([t_i - cap, t_i + cap], [ask, ask], color='black', alpha=0.6)
+                alpha = 0.35
+                plt.plot([t_i, t_i], [bid, ask], color='black', alpha=alpha, label=label)
+                plt.plot([t_i - cap, t_i + cap], [bid, bid], color='black', alpha=alpha)
+                plt.plot([t_i - cap, t_i + cap], [ask, ask], color='black', alpha=alpha)
         plt.grid(alpha=0.5)
-        plt.xlabel(r'$t$')
-        plt.ylabel(r'Price')
         if curve_length:
             plt.xlabel('Smoothness Parameter')
             plt.ylabel('Arc Length: ' + r'$\int \sqrt{1 + f\'(x)^{2}} \ dx$')
@@ -147,6 +153,9 @@ class Kriging:
             plt.xlabel(r'$t$')
             plt.ylabel(r'Price')
             plt.legend()
+        if filename:
+            for fmt in ['pdf', 'png', 'jpeg', 'eps']:
+                plt.savefig(os.path.join(FIG_DIR, fmt, f'{filename}.{fmt}'))
         plt.show()
 
 
@@ -187,13 +196,14 @@ k = Kriging(t, y_mid)
 
 
 # # ------------- Plot Nelson-Seigel ---------- #
-# k.plot_fns_midpoints()
-#k.show()
+k.fit_nelson_siegel()
+k.plot_nelson_siegel()
+k.show(filename='ns')
 
 # ------------- Plot Constrained Nelson-Seigel ---------- #
-k.fit_constrained_nelson_siegel()
-k.plot_nelson_siegel_constrained()
-k.show(intervals=True)
+# k.fit_constrained_nelson_siegel()
+# k.plot_nelson_siegel_constrained()
+# k.show(intervals=True, filename='ns-constrained')
 
 
 
@@ -202,26 +212,30 @@ k.show(intervals=True)
 # ------------- Plot Nelson-Seigel-Svensson ---------- #
 # k.fit_nelson_siegel_svensson()
 # k.plot_nelson_siegel_svensson()
-# k.show()
+# k.show(filename='ns-svensson')
 
 # ------------- Plot Constrained Nelson-Seigel-Svensson ---------- #
 # k.fit_constrained_nelson_siegel_svensson()
 # k.plot_nelson_siegel_svensson_constrained()
-# k.show(intervals=True)
+# k.show(intervals=True, filename='ns-svensson-constrained')
 
 
 
+# ------------- Plot Kriging (NS) ------------- #
+# k.fit_nelson_siegel()
+# k.plot_kriging()
+# k.show(filename='kriging')
 
 
 # ------------- Plot Kriging (Constrained NS) ------------- #
 # k.fit_constrained_nelson_siegel()
 # k.plot_kriging()
-# k.show()
+# k.show(filename='kriging-constrained')
 
 # ------------- Plot Kriging (Constrained NS-Svensson) ------------- #
 # k.fit_constrained_nelson_siegel_svensson()
 # k.plot_kriging_svensson()
-# k.show()
+# k.show(filename='kriging-svensson-constrained')
 
 
 
@@ -229,14 +243,14 @@ k.show(intervals=True)
 
 # ----------- Plot Curve-length (Kriging NS) ------------ #
 # k.fit_nelson_siegel()
-# x_smooth = np.linspace(0.7, 3, 10) 
+# x_smooth = np.linspace(1.0, 3.5, 30) 
 # k.plot_curve_lenghts(k.kriging, x_smooth)
-# k.show(curve_length=True)
+# k.show(curve_length=True, filename='arc-length-kriging')
 
 
 # ----------- Plot Total-curvature (Kriging NS) ------------ #
 # k.fit_nelson_siegel()
-# x_smooth = np.linspace(0.7, 2, 10) 
+# x_smooth = np.linspace(0.6, 1.75, 30) 
 # k.plot_curve_smoothness(k.kriging, x_smooth)
-# k.show(curve_smooth=True)
+# k.show(curve_smooth=True, filename='total-curvature-kriging')
 
