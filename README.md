@@ -13,6 +13,8 @@ Downloaded from: https://www.kaggle.com/datasets/nikitamanaenkov/historical-crud
 
 License: Apache 2.0
 
+Change `data_shift` variable in `data.py` to explore different timestamp intervals.
+
 ### kriging.py
 Kriging class with parameter updates, mutiple fitting paradimgs and plotting scripts. Execute:
 
