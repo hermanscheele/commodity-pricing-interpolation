@@ -30,7 +30,7 @@ python3 sample_illiquid_prices.py
 ```
 
 #### Main result:
-![My chart](figures/png/average_kriging_curve.png)
+<img src="figures/png/average_kriging_curve.png" width="400">
 
 
 ### kriging_constrained.py
