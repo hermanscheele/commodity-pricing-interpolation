@@ -29,5 +29,9 @@ Generates a liquid (exact) and illiquid (bid-ask) data split -> Fetches the cond
 python3 sample_illiquid_prices.py
 ```
 
+#### Main result:
+![My chart](figures/png/average_kriging_curve.png.png)
+
+
 ### kriging_constrained.py
 Soon to be, general class file for Kriging with Data Augumentation. Under construction.
