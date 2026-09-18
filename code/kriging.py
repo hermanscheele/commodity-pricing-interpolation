@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import os
 from data import t, y_mid, y_high, y_low
 
-FIG_DIR = 'figures'
+FIG_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'figures')
 for fmt in ['pdf', 'png', 'jpeg', 'eps']:
     os.makedirs(os.path.join(FIG_DIR, fmt), exist_ok=True)
 

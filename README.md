@@ -13,20 +13,22 @@ Downloaded from: https://www.kaggle.com/datasets/nikitamanaenkov/historical-crud
 
 License: Apache 2.0
 
-Change `data_shift` variable in `data.py` to explore different timestamp intervals.
+Change `data_shift` variable in `code/data.py` to explore different timestamp intervals.
+
+All scripts live in `code/` and are run from the repository root.
 
 ### kriging.py
 Kriging class with parameter updates, mutiple fitting paradimgs and plotting scripts. Execute:
 
 ```
-python3 kriging.py
+python3 code/kriging.py
 ```
 
 ### sample_illiquid_prices.py
 Generates a liquid (exact) and illiquid (bid-ask) data split -> Fetches the conditional gaussian distribution -> runs rejection sampling -> computes average curve -> plotting. Execute:
 
 ```
-python3 sample_illiquid_prices.py
+python3 code/sample_illiquid_prices.py
 ```
 
 #### Main result:

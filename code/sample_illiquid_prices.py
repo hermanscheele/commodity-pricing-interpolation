@@ -7,7 +7,7 @@ from kriging_utils import kriging_func
 from data import t, y_mid, y_low, y_high
 
 
-FIG_DIR = 'figures'
+FIG_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'figures')
 for fmt in ['pdf', 'png', 'jpeg', 'eps']:
     os.makedirs(os.path.join(FIG_DIR, fmt), exist_ok=True)
 
